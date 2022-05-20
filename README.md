@@ -3,7 +3,8 @@ Code and tools related to LoRa communication, particularly as pertains to data l
 
 
 
-##INITIALIZING NEW RASPBERRY PI
+## INITIALIZING NEW RASPBERRY PI
+
 Scripts in this repository use libraries provided by Adafruit, to be used with the "Adafruit LoRa 900 MHz Bonnet," product 4074.
 Libraries must be downloaded using the following terminal code lines:
 
