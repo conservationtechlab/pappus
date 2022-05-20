@@ -77,7 +77,7 @@ while True:
         display.text('RX: ', 0, 0, 1)
         display.text(packet_text, 25, 0, 1)
         print('RX: ' + packet_text) #added by trent: command line validation
-        echo_msg = packet_text+" received"
+        echo_msg = "Aphro. received: " + packet_text
         time.sleep(0.2)
         rfm9x.send(bytes(echo_msg,"UTF-8")) #send message to validate p2p communication
         time.sleep(1)
