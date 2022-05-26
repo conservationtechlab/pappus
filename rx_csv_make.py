@@ -26,24 +26,6 @@ import adafruit_ssd1306
 # Import RFM9x
 import adafruit_rfm9x
 
-
-
-# Button A
-btnA = DigitalInOut(board.D5)
-btnA.direction = Direction.INPUT
-btnA.pull = Pull.UP
-
-# Button B
-btnB = DigitalInOut(board.D6)
-btnB.direction = Direction.INPUT
-btnB.pull = Pull.UP
-
-# Button C
-btnC = DigitalInOut(board.D12)
-btnC.direction = Direction.INPUT
-btnC.pull = Pull.UP
-
-
 def configDisplay():# 128x32 OLED Display
     # Create the I2C interface.
     i2c = busio.I2C(board.SCL, board.SDA)
@@ -72,7 +54,9 @@ def getHostData(): #derived from scrubcam "little_readout.py"
     ip2 = subprocess.check_output(cmd, shell=True).decode("utf-8")
     return hostname, ip1, ip2
 
-
+def getIP1():
+    host, i1, i2 = getHostData()
+    return i1
 
 if __name__ == '__main__':
     rfm9x = configRadio()
@@ -102,9 +86,10 @@ if __name__ == '__main__':
         prev_packet = None
         while True:
             display.text(host_text, 0,0,1)
-            display.text(ip1_text, 0,spacing,1)
+            if ip1_text == "IP1: "+'':
+                ip1_text = 'IP1: ' + getIP1()
+            display.text(ip1_text, 0,spacing,1) #only 1 ip, if connection isn't on boot up then it wont show anything ever :/
             display.text(ip2_text,0,2*spacing,1)
-            display.show()
 
             packet = rfm9x.receive()
             if packet is None:
@@ -112,9 +97,12 @@ if __name__ == '__main__':
             elif packet is prev_packet:
                 display.text('- Same PKT -', 15, 3*spacing, 1)
             else:
-                packet_text = str(prev_packet, "utf-8")
+                packet_text = str(packet, "utf-8")
                 display.text("RX: "+packet_text, 0, 3*spacing, 1)
                 log_writer.writerow(['',time.time(),packet_text])
-
-            time.sleep(0.1)
+                prev_packet = packet
+                packet = None #might be unnecessary
+                display.show()
+                time.sleep(0.3)
+            display.show()
             display.fill(0)
