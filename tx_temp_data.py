@@ -21,7 +21,7 @@ import adafruit_ssd1306
 # Import RFM9x
 import adafruit_rfm9x
 #For accessing CPU temperature data
-from gpiozero import CPUTemparature
+from gpiozero import CPUTemperature
 
 
 def configDisplay():
