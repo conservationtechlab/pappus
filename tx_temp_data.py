@@ -48,7 +48,7 @@ def configRadio():
     rfm9x.tx_power = 23
     return rfm9x
 
-def sendTemp(rfm9x,count):
+def sendTemp(rfm9x):
     curr_time = int(time.time())
     temp_str = str(curr_time) + ": " + str(getTemperature())
     temp_data = bytes(temp_str,"utf-8")
