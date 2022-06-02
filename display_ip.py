@@ -36,6 +36,9 @@ def configDisplay():
     display.show()
     return display
 
+display = configDisplay()
+
+
 # returns hostname, first ip, and second ip
 def getHostData(): #derived from scrubcam "little_readout.py"
     cmd = "hostname"
@@ -50,10 +53,17 @@ def getIP1():
     host, i1, i2 = getHostData()
     return i1
 
-def displayInternetData(host_text):
-    ip1 = getIP1()
-    print (ip1)
+def getHost():
+    host, i1, i2 = getHostData()
+    return host
+
+def displayInternetData():
+    spacing = int(display.height/2)
+    
     display.fill(0)
+    ip1 = getIP1()
+    hostname = getHost()
+    host_text = "Host: " + hostname
     display.text(host_text, 0,0,1)
     ip1_text = 'IP1: ' + getIP1()
     display.text(ip1_text, 0,spacing,1)
@@ -66,22 +76,15 @@ def displayInternetData(host_text):
 def refreshInterrupt(signum, _):
     display.fill(0)
     display.show()
-    displayInternetData("IGNORE")
+    displayInternetData()
 
 
 if __name__ == '__main__':
     signal.signal(signal.SIGALRM, refreshInterrupt)
     signal.setitimer(signal.ITIMER_REAL, 3, 3)
 
-
     display = configDisplay()
-    spacing = int(display.height/2)
 
-    hostname, ip1, ip2 = getHostData()
-    host_text = "Host: " + hostname
-    ip1_text = "IP1: " + ip1
-    #ip2_text = "IP2: " + ip2
-
-    displayInternetData(host_text)
+    displayInternetData()
     while(True):
         True
