@@ -9,7 +9,7 @@ Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
 """
 # Import Python System Libraries
-import time
+import time, signal
 
 # Permit cmdline for getting host info
 import subprocess
@@ -58,6 +58,10 @@ def getIP1():
     host, i1, i2 = getHostData()
     return i1
 
+def refreshInterrupt(signum, _):
+    display.fill(0)
+    display.show()
+
 if __name__ == '__main__':
     rfm9x = configRadio()
     
@@ -84,8 +88,12 @@ if __name__ == '__main__':
     with open("TempTimeData.csv", 'a') as log_file:
         log_writer = csv.writer(log_file)
         prev_packet = None
+
+        signal.signal(signal.SIGALRM, refreshInterrupt)
+        signal.setitimer(signal.ITIMER_REAL, 2, 2)
+
         while True:
-            
+            display.fill(0)
             display.text(host_text, 0,0,1)
             if ip1 == None:
                 ip1_text = 'IP1: ' + getIP1()
@@ -103,7 +111,5 @@ if __name__ == '__main__':
                 log_writer.writerow(['',time.time(),packet_text])
                 prev_packet = packet
                 packet = None #might be unnecessary
-                display.show()
-                time.sleep(0.3)
             display.show()
-            display.fill(0)
+            

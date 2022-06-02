@@ -9,7 +9,7 @@ Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
 """
 # Import Python System Libraries
-import time
+import time, signal
 import subprocess
 
 # Import Blinka Libraries
@@ -65,6 +65,10 @@ def getHostData(): #derived from scrubcam "little_readout.py"
     ip2 = subprocess.check_output(cmd, shell=True).decode("utf-8")
     return hostname, ip1, ip2
 
+def refreshInterrupt(signum, _):
+    display.fill(0)
+    display.show()
+
 if __name__ == '__main__':
     rfm9x = configRadio()
     
@@ -73,17 +77,18 @@ if __name__ == '__main__':
 
     hostname, ip1, ip2 = getHostData()
     host_text = "Host: " + hostname
-    if ip1 == None:
-        ip1_text = 'IP1: ' + getIP1()
     ip1_text = "IP1: " + ip1
     ip2_text = "IP2: " + ip2
+
+    signal.signal(signal.SIGALRM, refreshInterrupt)
+    signal.setitimer(signal.ITIMER_REAL, 1, 1) # does not work for some reason
     
     while(True):
         display.fill(0)
         sent_packet = sendTemp(rfm9x)
-        time.sleep(1)
-        display.show()
         display.text(host_text, 0,0,1)
+        if ip1 == None:
+            ip1_text = 'IP1: ' + getIP1()
         display.text(ip1_text, 0,spacing,1)
         display.text(ip2_text,0,2*spacing,1)
         display.text(sent_packet,0,3*spacing,1)
