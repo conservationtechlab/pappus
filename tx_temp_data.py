@@ -73,6 +73,8 @@ if __name__ == '__main__':
 
     hostname, ip1, ip2 = getHostData()
     host_text = "Host: " + hostname
+    if ip1 == None:
+        ip1_text = 'IP1: ' + getIP1()
     ip1_text = "IP1: " + ip1
     ip2_text = "IP2: " + ip2
     

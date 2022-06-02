@@ -85,8 +85,9 @@ if __name__ == '__main__':
         log_writer = csv.writer(log_file)
         prev_packet = None
         while True:
+            
             display.text(host_text, 0,0,1)
-            if ip1_text == "IP1: "+'':
+            if ip1 == None:
                 ip1_text = 'IP1: ' + getIP1()
             display.text(ip1_text, 0,spacing,1) #only 1 ip, if connection isn't on boot up then it wont show anything ever :/
             display.text(ip2_text,0,2*spacing,1)
