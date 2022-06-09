@@ -50,10 +50,11 @@ def configRadio():
 
 def sendTemp(rfm9x):
     curr_time = int(time.time())
+    curr_hr_min = str(curr_time % 3600)
     temp_str = str(curr_time) + ": " + str(getTemperature())
     temp_data = bytes(temp_str,"utf-8")
     rfm9x.send(temp_data)
-    return temp_str
+    return curr_hr_min + ": " + str(getTemperature())
 
 # returns hostname, first ip, and second ip
 def getHostData(): #derived from scrubcam "little_readout.py"
@@ -64,6 +65,10 @@ def getHostData(): #derived from scrubcam "little_readout.py"
     cmd = "hostname -I | cut -d' ' -f2"
     ip2 = subprocess.check_output(cmd, shell=True).decode("utf-8")
     return hostname, ip1, ip2
+
+def getIP1():
+    host, i1, i2 = getHostData()
+    return i1
 
 def refreshInterrupt(signum, _):
     display.fill(0)
@@ -80,16 +85,15 @@ if __name__ == '__main__':
     ip1_text = "IP1: " + ip1
     ip2_text = "IP2: " + ip2
 
-    signal.signal(signal.SIGALRM, refreshInterrupt)
-    signal.setitimer(signal.ITIMER_REAL, 1, 1) # does not work for some reason
+    signal.signal(signal.SIGVTALRM, refreshInterrupt)
+    signal.setitimer(signal.ITIMER_VIRTUAL, 1, 1) # does not work for some reason
     
     while(True):
         display.fill(0)
         sent_packet = sendTemp(rfm9x)
         display.text(host_text, 0,0,1)
-        if ip1 == None:
-            ip1_text = 'IP1: ' + getIP1()
+        ip1_text = 'IP1: ' + getIP1() #update ip in case there is none at start
         display.text(ip1_text, 0,spacing,1)
-        display.text(ip2_text,0,2*spacing,1)
+        #display.text(ip2_text,0,2*spacing,1)
         display.text(sent_packet,0,3*spacing,1)
         display.show()
