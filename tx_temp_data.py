@@ -92,7 +92,8 @@ if __name__ == '__main__':
         display.fill(0)
         sent_packet = sendTemp(rfm9x)
         display.text(host_text, 0,0,1)
-        ip1_text = 'IP1: ' + getIP1() #update ip in case there is none at start
+        if len(ip1) < 2:
+            ip1_text = 'IP1: ' + getIP1() #update ip in case there is none at start
         display.text(ip1_text, 0,spacing,1)
         #display.text(ip2_text,0,2*spacing,1)
         display.text(sent_packet,0,3*spacing,1)
