@@ -71,7 +71,7 @@ if __name__ == '__main__':
     hostname, ip1, ip2 = getHostData()
     host_text = "Host: " + hostname
     ip1_text = "IP1: " + ip1
-    ip2_text = "IP2: " + ip2
+    #ip2_text = "IP2: " + ip2
 
     try:
         header = ["Log Time Start","Time Received","Packet Data"]
@@ -89,25 +89,25 @@ if __name__ == '__main__':
         log_writer = csv.writer(log_file)
         prev_packet = None
 
-        signal.signal(signal.SIGALRM, refreshInterrupt)
-        signal.setitimer(signal.ITIMER_REAL, 2, 2)
+        signal.signal(signal.SIGVTALRM, refreshInterrupt)
+        signal.setitimer(signal.ITIMER_VIRTUAL, 2, 2)
 
         while True:
             display.fill(0)
             display.text(host_text, 0,0,1)
-            if ip1 == None:
+            if ip1 == None: #confirmed to work
                 ip1_text = 'IP1: ' + getIP1()
             display.text(ip1_text, 0,spacing,1) #only 1 ip, if connection isn't on boot up then it wont show anything ever :/
-            display.text(ip2_text,0,2*spacing,1)
+            #display.text(ip2_text,0,2*spacing,1)
 
             packet = rfm9x.receive()
             if packet is None:
-                display.text('- Waiting for PKT -', 15, 3*spacing, 1)
+                display.text('- Waiting -', 15, 2*spacing, 1)
             elif packet is prev_packet:
-                display.text('- Same PKT -', 15, 3*spacing, 1)
+                display.text('- Same PKT -', 15, 2*spacing, 1)
             else:
                 packet_text = str(packet, "utf-8")
-                display.text("RX: "+packet_text, 0, 3*spacing, 1)
+                display.text("Received", 0, 2*spacing, 1)
                 log_writer.writerow(['',time.time(),packet_text])
                 prev_packet = packet
                 packet = None #might be unnecessary
