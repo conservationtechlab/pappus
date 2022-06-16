@@ -26,6 +26,10 @@ import adafruit_ssd1306
 # Import RFM9x
 import adafruit_rfm9x
 
+btnA = DigitalInOut(board.D5)
+btnA.direction = Direction.INPUT
+btnA.pull = Pull.UP
+
 def configDisplay():# 128x32 OLED Display
     # Create the I2C interface.
     i2c = busio.I2C(board.SCL, board.SDA)
@@ -93,9 +97,11 @@ if __name__ == '__main__':
         signal.setitimer(signal.ITIMER_VIRTUAL, 2, 2)
 
         while True:
+            if not btnA.value:
+                break
             display.fill(0)
             display.text(host_text, 0,0,1)
-            if ip1 == None: #confirmed to work
+            if len(ip1) < 3: #confirmed to work
                 ip1_text = 'IP1: ' + getIP1()
             display.text(ip1_text, 0,spacing,1) #only 1 ip, if connection isn't on boot up then it wont show anything ever :/
             #display.text(ip2_text,0,2*spacing,1)
