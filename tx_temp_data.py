@@ -88,13 +88,42 @@ if __name__ == '__main__':
     signal.signal(signal.SIGVTALRM, refreshInterrupt)
     signal.setitimer(signal.ITIMER_VIRTUAL, 1, 1) # does not work for some reason
     
-    while(True):
-        display.fill(0)
+    while True:
+        time.sleep(1)
         sent_packet = sendTemp(rfm9x)
+        display.fill(0)
+        display.show()
         display.text(host_text, 0,0,1)
         if len(ip1) < 2:
             ip1_text = 'IP1: ' + getIP1() #update ip in case there is none at start
         display.text(ip1_text, 0,spacing,1)
-        #display.text(ip2_text,0,2*spacing,1)
         display.text(sent_packet,0,3*spacing,1)
         display.show()
+
+
+
+#OLD/DEPRECATED
+# if __name__ == '__main__':
+#     rfm9x = configRadio()
+    
+#     display = configDisplay()
+#     spacing = int(display.height/4)
+
+#     hostname, ip1, ip2 = getHostData()
+#     host_text = "Host: " + hostname
+#     ip1_text = "IP1: " + ip1
+#     ip2_text = "IP2: " + ip2
+
+#     signal.signal(signal.SIGVTALRM, refreshInterrupt)
+#     signal.setitimer(signal.ITIMER_VIRTUAL, 1, 1) # does not work for some reason
+    
+#     while True:  
+#         display.fill(0)
+#         sent_packet = sendTemp(rfm9x)
+#         display.text(host_text, 0,0,1)
+#         if len(ip1) < 2:
+#             ip1_text = 'IP1: ' + getIP1() #update ip in case there is none at start
+#         display.text(ip1_text, 0,spacing,1)
+#         #display.text(ip2_text,0,2*spacing,1)
+#         display.text(sent_packet,0,3*spacing,1)
+#         display.show()
