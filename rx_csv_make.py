@@ -98,6 +98,9 @@ if __name__ == '__main__':
 
         while True:
             if not btnA.value:
+                display.fill(0)
+                display.text(ip1_text, 0,spacing,1)
+                display.show()
                 break
             display.fill(0)
             display.text(host_text, 0,0,1)

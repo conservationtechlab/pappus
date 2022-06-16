@@ -24,6 +24,11 @@ import adafruit_rfm9x
 from gpiozero import CPUTemperature
 
 
+btnA = DigitalInOut(board.D5)
+btnA.direction = Direction.INPUT
+btnA.pull = Pull.UP
+
+
 def configDisplay():
     # Create the I2C interface.
     i2c = busio.I2C(board.SCL, board.SDA)
@@ -89,6 +94,11 @@ if __name__ == '__main__':
 #    signal.setitimer(signal.ITIMER_VIRTUAL, 1, 1) # does not work for some reason
     
     while True:
+        if not btnA.value:
+            display.fill(0)
+            display.text(ip1_text, 0,spacing,1)
+            display.show()
+            break
         time.sleep(1)
         sent_packet = sendTemp(rfm9x)
         display.fill(0)
