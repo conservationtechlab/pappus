@@ -70,9 +70,9 @@ def getIP1():
     host, i1, i2 = getHostData()
     return i1
 
-def refreshInterrupt(signum, _):
-    display.fill(0)
-    display.show()
+#def refreshInterrupt(signum, _):
+#    display.fill(0)
+#    display.show()
 
 if __name__ == '__main__':
     rfm9x = configRadio()
@@ -85,8 +85,8 @@ if __name__ == '__main__':
     ip1_text = "IP1: " + ip1
     ip2_text = "IP2: " + ip2
 
-    signal.signal(signal.SIGVTALRM, refreshInterrupt)
-    signal.setitimer(signal.ITIMER_VIRTUAL, 1, 1) # does not work for some reason
+#    signal.signal(signal.SIGVTALRM, refreshInterrupt)
+#    signal.setitimer(signal.ITIMER_VIRTUAL, 1, 1) # does not work for some reason
     
     while True:
         time.sleep(1)
