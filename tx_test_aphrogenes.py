@@ -18,8 +18,6 @@ import board
 import adafruit_ssd1306
 # Import RFM9x
 import adafruit_rfm9x
-# For printing to the terminal
-import sys
 
 # Button A
 btnA = DigitalInOut(board.D5)
@@ -67,40 +65,39 @@ while True:
     if packet is None:
         display.show()
         display.text('- Waiting for PKT -', 15, 20, 1)
-       # rfm9x.send(bytes("WAITING","utf-8"))
+        # rfm9x.send(bytes("WAITING","utf-8"))
     else:
         # Display the packet text and rssi
         display.fill(0)
-       # rfm9x.send(bytes("RECEIVED","utf-8"))
+        # rfm9x.send(bytes("RECEIVED","utf-8"))
         prev_packet = packet
         packet_text = str(prev_packet, "utf-8")
         display.text('RX: ', 0, 0, 1)
         display.text(packet_text, 25, 0, 1)
-        print('RX: ' + packet_text) #added by trent: command line validation
+        print('RX: ' + packet_text)  # added by trent: command line validation
         echo_msg = "Aphro. received: " + packet_text
         time.sleep(0.2)
-        rfm9x.send(bytes(echo_msg,"UTF-8")) #send message to validate p2p communication
+        rfm9x.send(bytes(echo_msg, "UTF-8"))  # validate p2p communication
         time.sleep(1)
 
     if not btnA.value:
         # Send Button A
         display.fill(0)
-        button_a_data = bytes("Button A\r\n","utf-8")
+        button_a_data = bytes("Button A\r\n", "utf-8")
         rfm9x.send(button_a_data)
         display.text('Sent Button A!', 25, 15, 1)
     elif not btnB.value:
         # Send Button B
         display.fill(0)
-        button_b_data = bytes("Button B!\r\n","utf-8")
+        button_b_data = bytes("Button B!\r\n", "utf-8")
         rfm9x.send(button_b_data)
         display.text('Sent Button B!', 25, 15, 1)
     elif not btnC.value:
         # Send Button C
         display.fill(0)
-        button_c_data = bytes("Button C!\r\n","utf-8")
+        button_c_data = bytes("Button C!\r\n", "utf-8")
         rfm9x.send(button_c_data)
         display.text('Sent Button C!', 25, 15, 1)
-
 
     display.show()
     time.sleep(0.1)

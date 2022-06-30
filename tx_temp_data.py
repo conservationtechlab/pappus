@@ -9,7 +9,7 @@ Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
 """
 # Import Python System Libraries
-import time, signal
+import time
 import subprocess
 
 # Import Blinka Libraries
@@ -20,7 +20,7 @@ import board
 import adafruit_ssd1306
 # Import RFM9x
 import adafruit_rfm9x
-#For accessing CPU temperature data
+# For accessing CPU temperature data
 from gpiozero import CPUTemperature
 
 
@@ -41,9 +41,11 @@ def configDisplay():
     display.show()
     return display
 
+
 def getTemperature():
     cpu = CPUTemperature()
-    return cpu.temperature #float, in degrees celsius
+    return cpu.temperature  # float, in degrees celsius
+
 
 def configRadio():
     CS = DigitalInOut(board.CE1)
@@ -53,16 +55,18 @@ def configRadio():
     rfm9x.tx_power = 23
     return rfm9x
 
+
 def sendTemp(rfm9x):
     curr_time = int(time.time())
     curr_hr_min = str(curr_time % 3600)
     temp_str = str(curr_time) + ": " + str(getTemperature())
-    temp_data = bytes(temp_str,"utf-8")
+    temp_data = bytes(temp_str, "utf-8")
     rfm9x.send(temp_data)
     return curr_hr_min + ": " + str(getTemperature())
 
+
 # returns hostname, first ip, and second ip
-def getHostData(): #derived from scrubcam "little_readout.py"
+def getHostData():  # derived from scrubcam "little_readout.py"
     cmd = "hostname"
     hostname = subprocess.check_output(cmd, shell=True).decode("utf-8")
     cmd = "hostname -I | cut -d' ' -f1"
@@ -71,17 +75,15 @@ def getHostData(): #derived from scrubcam "little_readout.py"
     ip2 = subprocess.check_output(cmd, shell=True).decode("utf-8")
     return hostname, ip1, ip2
 
+
 def getIP1():
     host, i1, i2 = getHostData()
     return i1
 
-#def refreshInterrupt(signum, _):
-#    display.fill(0)
-#    display.show()
 
 if __name__ == '__main__':
     rfm9x = configRadio()
-    
+
     display = configDisplay()
     spacing = int(display.height/4)
 
@@ -90,50 +92,19 @@ if __name__ == '__main__':
     ip1_text = "IP1: " + ip1
     ip2_text = "IP2: " + ip2
 
-#    signal.signal(signal.SIGVTALRM, refreshInterrupt)
-#    signal.setitimer(signal.ITIMER_VIRTUAL, 1, 1) # does not work for some reason
-    
     while True:
         if not btnA.value:
             display.fill(0)
-            display.text(ip1_text, 0,spacing,1)
+            display.text(ip1_text, 0, spacing, 1)
             display.show()
             break
         time.sleep(1)
         sent_packet = sendTemp(rfm9x)
         display.fill(0)
         display.show()
-        display.text(host_text, 0,0,1)
+        display.text(host_text, 0, 0, 1)
         if len(ip1) < 2:
-            ip1_text = 'IP1: ' + getIP1() #update ip in case there is none at start
-        display.text(ip1_text, 0,spacing,1)
-        display.text(sent_packet,0,3*spacing,1)
+            ip1_text = 'IP1: ' + getIP1()  # update ip if none at start
+        display.text(ip1_text, 0, spacing, 1)
+        display.text(sent_packet, 0, 3*spacing, 1)
         display.show()
-
-
-
-#OLD/DEPRECATED
-# if __name__ == '__main__':
-#     rfm9x = configRadio()
-    
-#     display = configDisplay()
-#     spacing = int(display.height/4)
-
-#     hostname, ip1, ip2 = getHostData()
-#     host_text = "Host: " + hostname
-#     ip1_text = "IP1: " + ip1
-#     ip2_text = "IP2: " + ip2
-
-#     signal.signal(signal.SIGVTALRM, refreshInterrupt)
-#     signal.setitimer(signal.ITIMER_VIRTUAL, 1, 1) # does not work for some reason
-    
-#     while True:  
-#         display.fill(0)
-#         sent_packet = sendTemp(rfm9x)
-#         display.text(host_text, 0,0,1)
-#         if len(ip1) < 2:
-#             ip1_text = 'IP1: ' + getIP1() #update ip in case there is none at start
-#         display.text(ip1_text, 0,spacing,1)
-#         #display.text(ip2_text,0,2*spacing,1)
-#         display.text(sent_packet,0,3*spacing,1)
-#         display.show()

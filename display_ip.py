@@ -9,19 +9,15 @@ Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
 """
 # Import Python System Libraries
-import time, signal
+import signal
 import subprocess
 
 # Import Blinka Libraries
 import busio
-from digitalio import DigitalInOut, Direction, Pull
+from digitalio import DigitalInOut
 import board
 # Import the SSD1306 module.
 import adafruit_ssd1306
-# Import RFM9x
-import adafruit_rfm9x
-#For accessing CPU temperature data
-from gpiozero import CPUTemperature
 
 
 def configDisplay():
@@ -31,16 +27,17 @@ def configDisplay():
     # 128x32 OLED Display
     reset_pin = DigitalInOut(board.D4)
     display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, reset=reset_pin)
-    # Clear the display.
+    # Clear the display
     display.fill(0)
     display.show()
     return display
+
 
 display = configDisplay()
 
 
 # returns hostname, first ip, and second ip
-def getHostData(): #derived from scrubcam "little_readout.py"
+def getHostData():  # derived from scrubcam "little_readout.py"
     cmd = "hostname"
     hostname = subprocess.check_output(cmd, shell=True).decode("utf-8")
     cmd = "hostname -I | cut -d' ' -f1"
@@ -49,26 +46,27 @@ def getHostData(): #derived from scrubcam "little_readout.py"
     ip2 = subprocess.check_output(cmd, shell=True).decode("utf-8")
     return hostname, ip1, ip2
 
+
 def getIP1():
     host, i1, i2 = getHostData()
     return i1
+
 
 def getHost():
     host, i1, i2 = getHostData()
     return host
 
+
 def displayInternetData():
     spacing = int(display.height/2)
-    
+
     display.fill(0)
     ip1 = getIP1()
     hostname = getHost()
     host_text = "Host: " + hostname
-    display.text(host_text, 0,0,1)
+    display.text(host_text, 0, 0, 1)
     ip1_text = 'IP1: ' + getIP1()
-    display.text(ip1_text, 0,spacing,1)
-    #display.text(ip2_text,0,2*spacing,1)
-    #display.text(sent_packet,0,3*spacing,1)
+    display.text(ip1_text, 0, spacing, 1)
     display.show()
     return ip1
 
