@@ -122,7 +122,7 @@ if __name__ == '__main__':
             elif packet is prev_packet:
                 display.text('- Same PKT -', 15, 2*spacing, 1)
             else:
-                packet_text = str(packet, "utf-8")
+                packet_text = str(packet[4:], "utf-8")
                 display.text("Received", 0, 2*spacing, 1)
                 log_writer.writerow(['', time.time(), packet_text])
                 prev_packet = packet
