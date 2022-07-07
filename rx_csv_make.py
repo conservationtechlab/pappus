@@ -49,6 +49,8 @@ def configRadio():
     spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
     rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, 915.0)
     rfm9x.tx_power = 23
+    rfm9x.ack_delay = 0.1
+    rfm9x.node = ord('r') # r as in rx
     return rfm9x
 
 
@@ -114,7 +116,7 @@ if __name__ == '__main__':
                 ip1_text = 'IP1: ' + getIP1()
             display.text(ip1_text, 0, spacing, 1)
 
-            packet = rfm9x.receive()
+            packet = rfm9x.receive(with_ack=True, with_header=True)
             if packet is None:
                 display.text('- Waiting -', 15, 2*spacing, 1)
             elif packet is prev_packet:
