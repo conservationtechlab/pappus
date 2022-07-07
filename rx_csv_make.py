@@ -10,7 +10,7 @@ Author: Brent Rubell for Adafruit Industries
 """
 # Import Python System Libraries
 import time
-import signal
+import threading
 
 # Permit cmdline for getting host info
 import subprocess
@@ -31,6 +31,8 @@ btnA = DigitalInOut(board.D5)
 btnA.direction = Direction.INPUT
 btnA.pull = Pull.UP
 
+rec_packet_flag = False
+
 
 def configDisplay():  # 128x32 OLED Display
     # Create the I2C interface.
@@ -50,7 +52,7 @@ def configRadio():
     rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, 915.0)
     rfm9x.tx_power = 23
     rfm9x.ack_delay = 0.1
-    rfm9x.node = ord('r') # r as in rx
+    rfm9x.node = ord('r')  # r as in rx
     return rfm9x
 
 
@@ -70,20 +72,37 @@ def getIP1():
     return i1
 
 
-def refreshInterrupt(signum, _):
-    display.fill(0)
-    display.show()
+def updateDisplay():
+    global rec_packet_flag
+    while(True):
+        display.fill(0)
+        display.show()
+        getHostData()
+
+        spacing = int(display.height/4)
+
+        hostname, ip1, ip2 = getHostData()
+        host_text = "Host: " + hostname
+        ip1_text = "IP1: " + ip1
+        display.text(host_text, 0, 0, 1)
+        display.text(ip1_text, 0, spacing, 1)
+        if rec_packet_flag is False:
+            display.text('- Waiting -', 15, 2*spacing, 1)
+        else:
+            display.text('Received', 15, 2*spacing, 1)
+            rec_packet_flag = False
+
+        display.show()
+        time.sleep(1.5)
 
 
 if __name__ == '__main__':
     rfm9x = configRadio()
 
     display = configDisplay()
-    spacing = int(display.height/4)
 
-    hostname, ip1, ip2 = getHostData()
-    host_text = "Host: " + hostname
-    ip1_text = "IP1: " + ip1
+    displayUpdate = threading.Thread(target=updateDisplay, daemon=True)
+    displayUpdate.start()
 
     try:
         header = ["Log Time Start", "Time Received", "Packet Data"]
@@ -99,32 +118,17 @@ if __name__ == '__main__':
 
     with open("TempTimeData.csv", 'a') as log_file:
         log_writer = csv.writer(log_file)
-        prev_packet = None
-
-        signal.signal(signal.SIGVTALRM, refreshInterrupt)
-        signal.setitimer(signal.ITIMER_VIRTUAL, 2, 2)
 
         while True:
             if not btnA.value:
                 display.fill(0)
-                display.text(ip1_text, 0, spacing, 1)
                 display.show()
                 break
-            display.fill(0)
-            display.text(host_text, 0, 0, 1)
-            if len(ip1) < 3:  # confirmed to work
-                ip1_text = 'IP1: ' + getIP1()
-            display.text(ip1_text, 0, spacing, 1)
 
             packet = rfm9x.receive(with_ack=True, with_header=True)
             if packet is None:
-                display.text('- Waiting -', 15, 2*spacing, 1)
-            elif packet is prev_packet:
-                display.text('- Same PKT -', 15, 2*spacing, 1)
+                continue
             else:
+                rec_packet_flag = True
                 packet_text = str(packet[4:], "utf-8")
-                display.text("Received", 0, 2*spacing, 1)
                 log_writer.writerow(['', time.time(), packet_text])
-                prev_packet = packet
-                packet = None  # might be unnecessary
-            display.show()
