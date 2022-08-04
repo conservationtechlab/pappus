@@ -56,14 +56,13 @@ def configRadio():
     rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, 915.0)
     rfm9x.tx_power = 23
     rfm9x.ack_delay = 0.1
-    rfm9x.node = ord('t') # t as in tx
-    rfm9x.destination = ord('r') # r as in rx
+    rfm9x.node = ord('t')  # t as in tx
+    rfm9x.destination = ord('r')  # r as in rx
     return rfm9x
 
 
 def sendTemp(rfm9x):
     curr_time = int(time.time())
-    curr_hr_min = str(curr_time % 3600)
     temp_str = str(curr_time) + ": " + str(getTemperature())
     temp_data = bytes(temp_str, "utf-8")
     return rfm9x.send_with_ack(temp_data)
@@ -102,7 +101,7 @@ if __name__ == '__main__':
             display.text(ip1_text, 0, spacing, 1)
             display.show()
             break
-        time.sleep(1)
+        time.sleep(3)
         got_ack = sendTemp(rfm9x)
         display.fill(0)
         display.show()

@@ -93,7 +93,7 @@ def updateDisplay():
             rec_packet_flag = False
 
         display.show()
-        time.sleep(1.5)
+        time.sleep(1)
 
 
 if __name__ == '__main__':
@@ -118,6 +118,7 @@ if __name__ == '__main__':
 
     with open("TempTimeData.csv", 'a') as log_file:
         log_writer = csv.writer(log_file)
+        writer.writerow([time.time(), '', ''])
 
         while True:
             if not btnA.value:
