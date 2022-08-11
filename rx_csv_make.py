@@ -11,6 +11,7 @@ Author: Brent Rubell for Adafruit Industries
 # Import Python System Libraries
 import time
 import threading
+import datetime
 
 # Permit cmdline for getting host info
 import subprocess
@@ -72,6 +73,16 @@ def getIP1():
     return i1
 
 
+def currentDateTime():
+    return datetime.datetime.fromtimestamp(time.time())
+
+
+def convertPacketEpochToDateTime(packet):
+    packet_array = packet.split(':')
+    epoch_as_datetime = datetime.datetime.fromtimestamp(packet_array[0])
+    return epoch_as_datetime + ': ' + packet_array[1]
+
+
 def updateDisplay():
     global rec_packet_flag
     while(True):
@@ -105,12 +116,13 @@ if __name__ == '__main__':
     displayUpdate.start()
 
     try:
-        header = ["Log Time Start", "Time Received", "Packet Data"]
+        header = ["Log Time Start", "Time Received",
+                  "Packet Converted", "Packet Raw"]
 
-        with open("TempTimeData.csv", "x") as new_csv:
+        with open("TempTimeData.csv", 'x') as new_csv:
             writer = csv.writer(new_csv)
             writer.writerow(header)
-            writer.writerow([time.time(), '', ''])
+            writer.writerow([currentDateTime(), '', '', ''])
         new_csv.close()
 
     except FileExistsError:
@@ -118,9 +130,10 @@ if __name__ == '__main__':
 
     with open("TempTimeData.csv", 'a') as log_file:
         log_writer = csv.writer(log_file)
-        writer.writerow([time.time(), '', ''])
+        writer.writerow([currentDateTime(), '', '', ''])
 
         while True:
+            time.sleep(1)
             if not btnA.value:
                 display.fill(0)
                 display.show()
@@ -128,8 +141,10 @@ if __name__ == '__main__':
 
             packet = rfm9x.receive(with_ack=True, with_header=True)
             if packet is None:
-                continue
+                log_writer.writerow(['', currentDateTime(), ' ', ' '])
             else:
                 rec_packet_flag = True
                 packet_text = str(packet[4:], "utf-8")
-                log_writer.writerow(['', time.time(), packet_text])
+                packet_conv = convertPacketEpochToDateTime(packet_text)
+                data_row = ['', currentDateTime(), packet_conv, packet_text]
+                log_writer.writerow(data_row)
