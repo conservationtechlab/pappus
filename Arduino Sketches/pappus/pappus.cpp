@@ -45,3 +45,19 @@ bool packetAvailable(){
     }
     return false;
 }
+
+String readableDateTime(long microsStart) {
+  double totalSeconds = (micros() - microsStart)/1000000.0;
+  int totalMinutes = floor(totalSeconds)/60;
+  int totalHours = floor(totalSeconds)/3600;
+  int totalDays = 1 + floor(totalSeconds)/86400;
+  double secondsDouble = totalSeconds - totalMinutes*60;
+  int seconds = floor(secondsDouble);
+  int minutes = totalMinutes - totalHours*60;
+  int hours = totalHours - totalDays*24;
+  String yearMonth = " 1970-01-";
+  char dateTimeCharArray[19];
+  int deciseconds = round((secondsDouble - seconds)*1000000);
+  sprintf(dateTimeCharArray, "%02d %02d:%02d:%02d.%06d", totalDays, hours, minutes, seconds, deciseconds);
+  
+  return yearMonth + String(dateTimeCharArray);

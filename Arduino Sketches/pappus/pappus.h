@@ -17,4 +17,6 @@ String getRSSI();
 
 bool packetAvailable();
 
+String readableTimestamp(long mircosStart);
+
 #endif
