@@ -17,6 +17,7 @@ Author: Brent Rubell for Adafruit Industries
 # Import Python System Libraries
 import time
 import threading
+import datetime
 
 # Permit cmdline for getting host info
 import subprocess
@@ -78,7 +79,20 @@ def getIP1():
     return i1
 
 
+<<<<<<< HEAD
 # Display hostnam, ip address, and LoRa status
+=======
+def currentDateTime():
+    return datetime.datetime.fromtimestamp(time.time())
+
+
+def convertPacketEpochToDateTime(packet):
+    packet_array = packet.split(':')
+    epoch_as_datetime = datetime.datetime.fromtimestamp(packet_array[0])
+    return epoch_as_datetime + ': ' + packet_array[1]
+
+
+>>>>>>> 62f4b606a57a1be52b215cda9370d4ebc1fec43d
 def updateDisplay():
     global rec_packet_flag
     while(True):
@@ -112,13 +126,18 @@ if __name__ == '__main__':
     displayUpdate.start()
 
     try:
+<<<<<<< HEAD
         # First row indicates a new log start
         header = ["Log Time Start", "Time Received", "Packet Data"]
+=======
+        header = ["Log Time Start", "Time Received",
+                  "Packet Converted", "Packet Raw"]
+>>>>>>> 62f4b606a57a1be52b215cda9370d4ebc1fec43d
 
-        with open("TempTimeData.csv", "x") as new_csv:
+        with open("TempTimeData.csv", 'x') as new_csv:
             writer = csv.writer(new_csv)
             writer.writerow(header)
-            writer.writerow([time.time(), '', ''])
+            writer.writerow([currentDateTime(), '', '', ''])
         new_csv.close()
 
     except FileExistsError:
@@ -126,9 +145,14 @@ if __name__ == '__main__':
 
     with open("TempTimeData.csv", 'a') as log_file:
         log_writer = csv.writer(log_file)
+<<<<<<< HEAD
         writer.writerow([time.time(), '', ''])  # New log start
+=======
+        writer.writerow([currentDateTime(), '', '', ''])
+>>>>>>> 62f4b606a57a1be52b215cda9370d4ebc1fec43d
 
         while True:
+            time.sleep(1)
             if not btnA.value:
                 display.fill(0)
                 display.show()
@@ -137,8 +161,10 @@ if __name__ == '__main__':
             # Only receives from nodes addressed to 0x72 -- should be able to receive non ack messages as well...
             packet = rfm9x.receive(with_ack=True, with_header=True)
             if packet is None:
-                continue
+                log_writer.writerow(['', currentDateTime(), ' ', ' '])
             else:
                 rec_packet_flag = True  # For LoRa status on display
                 packet_text = str(packet[4:], "utf-8")
-                log_writer.writerow(['', time.time(), packet_text])
+                packet_conv = convertPacketEpochToDateTime(packet_text)
+                data_row = ['', currentDateTime(), packet_conv, packet_text]
+                log_writer.writerow(data_row)
