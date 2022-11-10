@@ -1,14 +1,20 @@
-# SPDX-FileCopyrightText: 2018 Brent Rubell for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
-
 """
-Example for using the RFM9x Radio with Raspberry Pi.
+Purpose: Send "ack" LoRa messages with temperature data
+Organization: San Diego Wildlife Association: Conservation Technology Lab (CTL)
+Author: Trent Moca
+Date: 11/10/22
 
+Collect temperature data using gpiozero CPU temperature, then acknowledge send over LoRa.
+Additionally, display internet data and LoRa status on the builtin OLED. If the packet was
+unable to reach the indended destination (ie: ack was not received), indicate on the display.
+This code may be used on the transmitting node in a 2-node test with the receiver running the 
+"rx_csv_make.py" code. 
+
+SOURCE
 Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
 """
-# RFM9X GitHub Repo : https://github.com/adafruit/Adafruit_CircuitPython_RFM9x
+
 
 # Import Python System Libraries
 import time
@@ -21,7 +27,7 @@ import board
 # Import the SSD1306 module.
 import adafruit_ssd1306
 # Import RFM9x
-import adafruit_rfm9x
+import adafruit_rfm9x  # https://github.com/adafruit/Adafruit_CircuitPython_RFM9x/blob/main/adafruit_rfm9x.py
 # For accessing CPU temperature data
 from gpiozero import CPUTemperature
 
@@ -56,8 +62,8 @@ def configRadio():
     rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, 915.0)
     rfm9x.tx_power = 23
     rfm9x.ack_delay = 0.1
-    rfm9x.node = ord('t')  # t as in tx
-    rfm9x.destination = ord('r')  # r as in rx
+    rfm9x.node = ord('t')  # t as in tx -> inconsequential
+    rfm9x.destination = ord('r')  # r as in rx -> rx_csv_make.py
     return rfm9x
 
 
@@ -86,8 +92,8 @@ def getIP1():
 
 if __name__ == '__main__':
     rfm9x = configRadio()
-
     display = configDisplay()
+
     spacing = int(display.height/4)
 
     hostname, ip1, ip2 = getHostData()
@@ -95,6 +101,7 @@ if __name__ == '__main__':
     ip1_text = "IP1: " + ip1
     ip2_text = "IP2: " + ip2
 
+    # Send LoRa, but mostly fill and refresh the display
     while True:
         if not btnA.value:
             display.fill(0)
@@ -102,13 +109,14 @@ if __name__ == '__main__':
             display.show()
             break
         time.sleep(3)
-        got_ack = sendTemp(rfm9x)
+        got_ack = sendTemp(rfm9x)  
         display.fill(0)
         display.show()
         display.text(host_text, 0, 0, 1)
         if len(ip1) < 2:
             ip1_text = 'IP1: ' + getIP1()  # update ip if none at start
         display.text(ip1_text, 0, spacing, 1)
+        # Update LoRa status
         if (got_ack):
             display.text('Sent Successfully', 0, 3*spacing, 1)
         else:

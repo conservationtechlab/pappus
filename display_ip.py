@@ -1,13 +1,11 @@
-# SPDX-FileCopyrightText: 2018 Brent Rubell for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
-
+""""
+Purpose: Display IP information to OLED on "Adafruit Radio+OLED bonnet"
+Organization: San Diego Wildlife Association: Conservation Technology Lab (CTL)
+Author: Trent Moca
+Date: 11/10/22
 """
-Example for using the RFM9x Radio with Raspberry Pi.
 
-Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
-Author: Brent Rubell for Adafruit Industries
-"""
+
 # Import Python System Libraries
 import signal
 import subprocess

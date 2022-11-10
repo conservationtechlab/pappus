@@ -1,10 +1,16 @@
-# SPDX-FileCopyrightText: 2018 Brent Rubell for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
-
 """
-Example for using the RFM9x Radio with Raspberry Pi.
+Purpose: Log LoRa messages addressed to this to a CSV file
+Organization: San Diego Wildlife Association: Conservation Technology Lab (CTL)
+Author: Trent Moca
+Date: 11/10/22
 
+This code configures a Raspberry Pi to be a LoRa receiver, with a node address of 
+0x72 ('r' in ascii). All LoRa logs are appended to a CSV file with a timestamp 
+reflecting seconds since the epoch. Additionally, the IP address and hostname for
+the LoRa device are displayed on an LCD screen that comes built in on the Adafruit 
+RFM9X LoRa shield.
+
+SOURCE
 Learn Guide: https://learn.adafruit.com/lora-and-lorawan-for-raspberry-pi
 Author: Brent Rubell for Adafruit Industries
 """
@@ -25,7 +31,7 @@ import board
 # Import the SSD1306 module.
 import adafruit_ssd1306
 # Import RFM9x
-import adafruit_rfm9x
+import adafruit_rfm9x  # https://github.com/adafruit/Adafruit_CircuitPython_RFM9x/blob/main/adafruit_rfm9x.py
 
 btnA = DigitalInOut(board.D5)
 btnA.direction = Direction.INPUT
@@ -72,6 +78,7 @@ def getIP1():
     return i1
 
 
+# Display hostnam, ip address, and LoRa status
 def updateDisplay():
     global rec_packet_flag
     while(True):
@@ -105,6 +112,7 @@ if __name__ == '__main__':
     displayUpdate.start()
 
     try:
+        # First row indicates a new log start
         header = ["Log Time Start", "Time Received", "Packet Data"]
 
         with open("TempTimeData.csv", "x") as new_csv:
@@ -118,7 +126,7 @@ if __name__ == '__main__':
 
     with open("TempTimeData.csv", 'a') as log_file:
         log_writer = csv.writer(log_file)
-        writer.writerow([time.time(), '', ''])
+        writer.writerow([time.time(), '', ''])  # New log start
 
         while True:
             if not btnA.value:
@@ -126,10 +134,11 @@ if __name__ == '__main__':
                 display.show()
                 break
 
+            # Only receives from nodes addressed to 0x72 -- should be able to receive non ack messages as well...
             packet = rfm9x.receive(with_ack=True, with_header=True)
             if packet is None:
                 continue
             else:
-                rec_packet_flag = True
+                rec_packet_flag = True  # For LoRa status on display
                 packet_text = str(packet[4:], "utf-8")
                 log_writer.writerow(['', time.time(), packet_text])
