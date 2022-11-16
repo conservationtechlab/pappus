@@ -30,6 +30,9 @@ void loop() {
 
   String message = "Hello world! #" + String(counter);
   sendLoraPacket(packetHeader, message);
+  Serial.println(message);
+  counter++;
+ 
 
   delay(2000);
 
