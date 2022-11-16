@@ -1,6 +1,6 @@
 #include <SPI.h>
 #include <LoRa.h>
-#include <pappus.h>
+#include <Pappus.h>
 
 int counter = 0;
 byte NODE_ID = 0x01;
