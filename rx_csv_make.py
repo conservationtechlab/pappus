@@ -79,9 +79,7 @@ def getIP1():
     return i1
 
 
-<<<<<<< HEAD
 # Display hostnam, ip address, and LoRa status
-=======
 def currentDateTime():
     return datetime.datetime.fromtimestamp(time.time())
 
@@ -92,7 +90,6 @@ def convertPacketEpochToDateTime(packet):
     return epoch_as_datetime + ': ' + packet_array[1]
 
 
->>>>>>> 62f4b606a57a1be52b215cda9370d4ebc1fec43d
 def updateDisplay():
     global rec_packet_flag
     while(True):
@@ -126,13 +123,9 @@ if __name__ == '__main__':
     displayUpdate.start()
 
     try:
-<<<<<<< HEAD
         # First row indicates a new log start
-        header = ["Log Time Start", "Time Received", "Packet Data"]
-=======
         header = ["Log Time Start", "Time Received",
                   "Packet Converted", "Packet Raw"]
->>>>>>> 62f4b606a57a1be52b215cda9370d4ebc1fec43d
 
         with open("TempTimeData.csv", 'x') as new_csv:
             writer = csv.writer(new_csv)
@@ -145,11 +138,7 @@ if __name__ == '__main__':
 
     with open("TempTimeData.csv", 'a') as log_file:
         log_writer = csv.writer(log_file)
-<<<<<<< HEAD
-        writer.writerow([time.time(), '', ''])  # New log start
-=======
-        writer.writerow([currentDateTime(), '', '', ''])
->>>>>>> 62f4b606a57a1be52b215cda9370d4ebc1fec43d
+        writer.writerow([currentDateTime(), '', '', '']) # New log start
 
         while True:
             time.sleep(1)
